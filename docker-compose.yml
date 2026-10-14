@@ -1,0 +1,16 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: notification-rabbitmq
+    ports:
+      - "5672:5672"    # AMQP protocol
+      - "15672:15672"  # Management Web UI (http://localhost:15672)
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  rabbitmq_data:
+
