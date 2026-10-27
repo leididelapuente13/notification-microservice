@@ -34,8 +34,16 @@ public class RabbitNotificationConfiguration {
   }
 
   @Bean
+  Binding walletNotificationBinding(
+      final Queue notificationQueue,
+      final TopicExchange domainEventsExchange) {
+    return BindingBuilder.bind(notificationQueue)
+        .to(domainEventsExchange)
+        .with("wallet.#");
+  }
+
+  @Bean
   MessageConverter rabbitMessageConverter() {
     return new JacksonJsonMessageConverter();
   }
-
 }

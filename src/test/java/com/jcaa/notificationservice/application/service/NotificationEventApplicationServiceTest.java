@@ -33,6 +33,28 @@ class NotificationEventApplicationServiceTest {
   }
 
   @Test
+  void shouldSendEmailForFundsDepositedEvent() {
+    // Arrange
+    final RecordingEmailSender emailSenderPort = new RecordingEmailSender();
+    final NotificationEventApplicationService service =
+        new NotificationEventApplicationService(emailSenderPort, new UserEventEmailMapper());
+    final ProcessDomainEventCommand command =
+        new ProcessDomainEventCommand(
+            "wallet.funds-deposited",
+            LocalDateTime.of(2026, 10, 12, 14, 30),
+            Map.of("name", "Ana Perez", "email", "ana.perez@example.com", "amount", "50000", "currency", "COP"));
+
+    // Act
+    service.process(command);
+
+    // Assert
+    final EmailDestination destination = emailSenderPort.sentEmails().getFirst();
+    assertThat(destination.destinationEmail().value()).isEqualTo("ana.perez@example.com");
+    assertThat(destination.subject()).isEqualTo("Deposit received successfully");
+    assertThat(destination.body()).contains("deposit of 50000 COP was successfully credited");
+  }
+
+  @Test
   void shouldAcknowledgeDeletedEventWithoutSendingEmail() {
     // Arrange
     final RecordingEmailSender emailSenderPort = new RecordingEmailSender();
@@ -101,7 +123,7 @@ class NotificationEventApplicationServiceTest {
       sentEmails.add(destination);
     }
 
-    private List<EmailDestination> sentEmails() {
+    List<EmailDestination> sentEmails() {
       return List.copyOf(sentEmails);
     }
   }

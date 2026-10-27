@@ -50,6 +50,26 @@ class UserEventEmailMapperTest {
   }
 
   @Test
+  void shouldMapFundsDepositedEvent() {
+    // Arrange
+    final ProcessDomainEventCommand command =
+        new ProcessDomainEventCommand(
+            "wallet.funds-deposited",
+            OCCURRED_ON,
+            Map.of("name", "Ana Perez", "email", "ana.perez@example.com", "amount", "50000", "currency", "COP"));
+
+    // Act
+    final EmailDestination destination = mapper.toEmailDestination(command, UserEventType.FUNDS_DEPOSITED);
+
+    // Assert
+    assertAll(
+        () -> assertThat(destination.destinationEmail().value()).isEqualTo("ana.perez@example.com"),
+        () -> assertThat(destination.destinationName()).isEqualTo("Ana Perez"),
+        () -> assertThat(destination.subject()).isEqualTo("Deposit received successfully"),
+        () -> assertThat(destination.body()).contains("deposit of 50000 COP was successfully credited"));
+  }
+
+  @Test
   void shouldRejectNullPayload() {
     // Arrange
     final ProcessDomainEventCommand command =

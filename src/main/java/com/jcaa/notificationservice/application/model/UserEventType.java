@@ -7,7 +7,8 @@ import java.util.Objects;
 public enum UserEventType {
   CREATED("user.created"),
   UPDATED("user.updated"),
-  DELETED("user.deleted");
+  DELETED("user.deleted"),
+  FUNDS_DEPOSITED("wallet.funds-deposited");
 
   private static final String UNKNOWN_EVENT_MESSAGE = "Unsupported notification event.";
 
@@ -20,6 +21,9 @@ public enum UserEventType {
   public static UserEventType from(final String eventName) {
     if (Objects.isNull(eventName)) {
       throw new InvalidNotificationEventException(UNKNOWN_EVENT_MESSAGE);
+    }
+    if ("user.funds-deposited".equals(eventName) || "wallet.funds-deposited".equals(eventName)) {
+      return FUNDS_DEPOSITED;
     }
     return Arrays.stream(values())
         .filter(eventType -> eventType.eventName.equals(eventName))
